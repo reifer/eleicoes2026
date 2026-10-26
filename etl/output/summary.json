@@ -1,0 +1,44 @@
+{
+  "updated_at": "2026-10-26T17:22:01Z",
+  "totais_brasil": {
+    "t1": {
+      "aptos": 700,
+      "validos": 315,
+      "lula": 150,
+      "bolsonaro": 150,
+      "demais": 15,
+      "brancos": 4,
+      "nulos": 6,
+      "abstencao": 150
+    },
+    "t2": {
+      "aptos": 700,
+      "validos": 300,
+      "lula": 205,
+      "bolsonaro": 95,
+      "demais": 0,
+      "brancos": 3,
+      "nulos": 3,
+      "abstencao": 130
+    }
+  },
+  "pos_17h_brasil": {
+    "secoes_total": 3,
+    "secoes_pos_17h": 1,
+    "votos_lula_pos_17h": 70,
+    "votos_bolsonaro_pos_17h": 30,
+    "brancos_pos_17h": 1,
+    "nulos_pos_17h": 1
+  },
+  "ufs": [
+    {
+      "sigla": "AC",
+      "nome": "Acre"
+    },
+    {
+      "sigla": "SP",
+      "nome": "São Paulo"
+    }
+  ],
+  "data_source": "demo"
+}

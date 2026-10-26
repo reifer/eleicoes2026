@@ -1,0 +1,29 @@
+# Dados brutos do TSE
+/etl/raw/
+
+# Ambientes e dependências
+.venv/
+venv/
+env/
+node_modules/
+
+# Saídas locais de build e cobertura
+/dist/
+/coverage/
+
+# Cache e arquivos temporários
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Arquivos locais de IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,70 @@
+{
+  "uf": "SP",
+  "nome_estado": "São Paulo",
+  "total_municipios": 1,
+  "totais": {
+    "t1": {
+      "aptos": 200,
+      "validos": 100,
+      "lula": 80,
+      "bolsonaro": 20,
+      "demais": 0,
+      "brancos": 1,
+      "nulos": 1,
+      "abstencao": 50
+    },
+    "t2": {
+      "aptos": 200,
+      "validos": 100,
+      "lula": 85,
+      "bolsonaro": 15,
+      "demais": 0,
+      "brancos": 1,
+      "nulos": 1,
+      "abstencao": 40
+    }
+  },
+  "pos_17h": {
+    "secoes_total": 1,
+    "secoes_pos_17h": 0,
+    "votos_lula_pos_17h": 0,
+    "votos_bolsonaro_pos_17h": 0,
+    "brancos_pos_17h": 0,
+    "nulos_pos_17h": 0
+  },
+  "viradas_municipios": [],
+  "municipios": [
+    {
+      "cd_mun": "00002",
+      "nome": "MUNICÍPIO DEMO B",
+      "flipped": false,
+      "t1": {
+        "aptos": 200,
+        "validos": 100,
+        "lula": 80,
+        "bolsonaro": 20,
+        "demais": 0,
+        "brancos": 1,
+        "nulos": 1,
+        "abstencao": 50
+      },
+      "t2": {
+        "aptos": 200,
+        "validos": 100,
+        "lula": 85,
+        "bolsonaro": 15,
+        "demais": 0,
+        "brancos": 1,
+        "nulos": 1,
+        "abstencao": 40
+      },
+      "pos_17h": {
+        "secoes_totais": 1,
+        "secoes_pos_17h": 0,
+        "votos_lula": 0,
+        "votos_bolsonaro": 0
+      }
+    }
+  ],
+  "data_source": "demo"
+}
