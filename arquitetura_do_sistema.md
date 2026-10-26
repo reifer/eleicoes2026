@@ -1,6 +1,6 @@
-# Especificação de Arquitetura: Análise Eleitoral 2022 (Mobile-First PWA)
+# Especificação de Arquitetura: Análise Eleitoral 2026 (Mobile-First PWA)
 
-Este documento especifica a arquitetura técnica para a aplicação web mobile-first destinada à análise comparativa dos resultados do 1º e 2º turno das Eleições Presidenciais de 2022 no Brasil, com foco em migração de votos, abstenções, nulos/brancos, "viradas" (flips) regionais e o impacto dos votos apurados/encerrados após as 17h no 2º turno.
+Este documento especifica a arquitetura técnica para a aplicação web mobile-first destinada à análise comparativa dos resultados do 1º e 2º turno das Eleições Presidenciais de 2026 no Brasil, com foco em migração de votos, abstenções, nulos/brancos, "viradas" (flips) regionais e o impacto dos votos apurados/encerrados após as 17h no 2º turno.
 
 ---
 

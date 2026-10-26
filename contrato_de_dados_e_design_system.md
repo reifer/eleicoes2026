@@ -1,18 +1,20 @@
 # Contrato de Dados e Especificação de Interface (Mobile-First)
 
-Este documento especifica o contrato dos dados gerados pelo pipeline ETL (Python) para consumo da aplicação frontend (React PWA), assim como as convenções de design system, paleta de cores e interatividade mobile.
+Este documento especifica o contrato dos dados das Eleições Presidenciais de 2026 gerados pelo pipeline ETL (Python) para consumo da aplicação frontend (React PWA), assim como as convenções de design system, paleta de cores e interatividade mobile.
+
+> Os valores numéricos nos exemplos abaixo são apenas ilustrativos e não constituem resultados oficiais de 2026. As saídas de demonstração do ETL também são sintéticas e identificadas por `data_source: "demo"`.
 
 ---
 
 ## 1. Esquema dos Arquivos JSON (Camada de Dados)
 
-### 1.1 Resumo Nacional (`/etl/output/summary.json`)
+### 1.1 Resumo Nacional (`/data/summary.json`, publicado em `public/data/summary.json`)
 
 Carregado no momento da inicialização da aplicação para alimentar a aba principal de Visão Geral.
 
 ```json
 {
-  "updated_at": "2022-10-31T02:00:00Z",
+  "updated_at": "2026-10-26T02:00:00Z",
   "totais_brasil": {
     "t1": {
       "aptos": 156454011,
@@ -52,7 +54,7 @@ Carregado no momento da inicialização da aplicação para alimentar a aba prin
 
 ---
 
-### 1.2 Dados por Estado (`/etl/output/states/{UF}.json`)
+### 1.2 Dados por Estado (`/data/states/{UF}.json`, publicado em `public/data/states/{UF}.json`)
 
 Carregado sob demanda quando o usuário seleciona um estado específico no aplicativo.
 

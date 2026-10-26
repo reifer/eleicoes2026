@@ -22,8 +22,21 @@ class ProcessTseTests(unittest.TestCase):
 
             summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
             acre = json.loads((output / "states" / "AC.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                set(summary),
+                {"updated_at", "totais_brasil", "pos_17h_brasil", "ufs", "data_source"},
+            )
             self.assertEqual(summary["data_source"], "demo")
             self.assertEqual({item["sigla"] for item in summary["ufs"]}, {"AC", "SP"})
+            self.assertTrue({"aptos", "validos", "lula", "bolsonaro", "demais", "brancos", "nulos", "abstencao"}
+                            <= set(summary["totais_brasil"]["t1"]))
+            self.assertEqual(
+                set(acre),
+                {
+                    "uf", "nome_estado", "total_municipios", "totais", "pos_17h",
+                    "viradas_municipios", "municipios", "data_source",
+                },
+            )
             self.assertEqual(acre["municipios"][0]["flipped"], True)
             self.assertEqual(acre["pos_17h"]["secoes_pos_17h"], 1)
             self.assertEqual(acre["pos_17h"]["votos_lula_pos_17h"], 70)
@@ -70,8 +83,8 @@ class ProcessTseTests(unittest.TestCase):
                 bulletins,
                 ["SG_UF", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "DH_GERACAO"],
                 [
-                    ["AC", "00001", "1", "1", "30/10/2022 17:00:01"],
-                    ["AC", "00001", "1", "2", "30/10/2022 17:00:00"],
+                    ["AC", "00001", "1", "1", "25/10/2026 17:00:01"],
+                    ["AC", "00001", "1", "2", "25/10/2026 17:00:00"],
                 ],
             )
 
@@ -104,6 +117,87 @@ class ProcessTseTests(unittest.TestCase):
             ])
             self.assertEqual(result, 2)
             self.assertFalse(output.exists())
+
+    def test_missing_vote_value_is_rejected_without_generating_output(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            vote_headers = [
+                "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO",
+                "NR_TURNO", "CD_CARGO", "DS_CARGO", "NR_VOTAVEL", "NM_VOTAVEL", "QT_VOTOS",
+            ]
+            malformed = folder / "malformed.csv"
+            self._write_csv(malformed, vote_headers, [
+                ["AC", "00001", "MUNICIPIO TESTE", "1", "1", "1", "1", "Presidente", "13", "LULA", ""],
+            ])
+            output = folder / "output"
+            result = main([
+                "--first-turn", str(malformed),
+                "--second-turn", str(malformed),
+                "--attendance", str(malformed),
+                "--bu", str(malformed),
+                "--output-dir", str(output),
+            ])
+            self.assertEqual(result, 2)
+            self.assertFalse(output.exists())
+
+    def test_duplicate_attendance_section_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "attendance.csv"
+            self._write_csv(
+                path,
+                ["SG_UF", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "NR_TURNO", "QT_APTOS", "QT_ABSTENCOES"],
+                [
+                    ["AC", "00001", "1", "1", "1", "100", "10"],
+                    ["AC", "00001", "1", "1", "1", "100", "10"],
+                ],
+            )
+            from process_tse import EtlError, read_attendance
+
+            with self.assertRaisesRegex(EtlError, "Mais de um registro"):
+                read_attendance(path, 1, ";", "latin-1")
+
+    def test_municipality_without_flip_has_empty_flip_list(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            vote_headers = [
+                "SG_UF", "CD_MUNICIPIO", "NM_MUNICIPIO", "NR_ZONA", "NR_SECAO",
+                "NR_TURNO", "CD_CARGO", "DS_CARGO", "NR_VOTAVEL", "NM_VOTAVEL", "QT_VOTOS",
+            ]
+            first = folder / "t1.csv"
+            second = folder / "t2.csv"
+            attendance = folder / "attendance.csv"
+            bulletins = folder / "bu.csv"
+            self._write_csv(first, vote_headers, [
+                ["SP", "00002", "MUNICIPIO ESTAVEL", "1", "1", "1", "1", "Presidente", "13", "LULA", "80"],
+                ["SP", "00002", "MUNICIPIO ESTAVEL", "1", "1", "1", "1", "Presidente", "22", "JAIR BOLSONARO", "20"],
+            ])
+            self._write_csv(second, vote_headers, [
+                ["SP", "00002", "MUNICIPIO ESTAVEL", "1", "1", "2", "1", "Presidente", "13", "LULA", "70"],
+                ["SP", "00002", "MUNICIPIO ESTAVEL", "1", "1", "2", "1", "Presidente", "22", "JAIR BOLSONARO", "30"],
+            ])
+            self._write_csv(attendance, [
+                "SG_UF", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "NR_TURNO", "QT_APTOS", "QT_ABSTENCOES",
+            ], [
+                ["SP", "00002", "1", "1", "1", "120", "10"],
+                ["SP", "00002", "1", "1", "2", "120", "10"],
+            ])
+            self._write_csv(
+                bulletins,
+                ["SG_UF", "CD_MUNICIPIO", "NR_ZONA", "NR_SECAO", "DH_GERACAO"],
+                [["SP", "00002", "1", "1", "25/10/2026 16:59:59"]],
+            )
+            output = folder / "output"
+            result = main([
+                "--first-turn", str(first),
+                "--second-turn", str(second),
+                "--attendance", str(attendance),
+                "--bu", str(bulletins),
+                "--output-dir", str(output),
+            ])
+            self.assertEqual(result, 0)
+            state = json.loads((output / "states" / "SP.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["municipios"][0]["flipped"], False)
+            self.assertEqual(state["viradas_municipios"], [])
 
 
 if __name__ == "__main__":

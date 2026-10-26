@@ -1,6 +1,6 @@
-# Estrutura de Diretórios do Projeto: Análise Eleitoral 2022 (Mobile-First)
+# Estrutura de Diretórios do Projeto: Análise Eleitoral 2026 (Mobile-First)
 
-Este documento especifica a organização de arquivos e diretórios do projeto **Análise Eleitoral 2022**, abrangendo a divisão entre a camada de ETL (Python) e o frontend web mobile-first (React + TypeScript + Vite + TailwindCSS).
+Este documento especifica a organização de arquivos e diretórios do projeto **Análise Eleitoral 2026**, abrangendo a divisão entre a camada de ETL (Python) e o frontend web mobile-first (React + TypeScript + Vite + TailwindCSS).
 
 ```text
 eleicoes-analise-mobile/
@@ -13,12 +13,14 @@ eleicoes-analise-mobile/
 ├── arquitetura.md             # Especificação técnica da arquitetura do sistema
 ├── arvorediretorio.md         # Mapeamento e especificação da estrutura de diretórios
 │
+├── public/                    # Arquivos estáticos servidos pelo Vite
+│   └── data/                  # Artefatos JSON gerados pelo ETL e publicados na CDN
+│       ├── summary.json       # Resumo consolidado nacional
+│       └── states/            # JSONs individuais por estado
+│
 ├── etl/                       # Pipeline de Processamento de Dados (Python)
 │   ├── requirements.txt       # Dependências do ETL (pandas, requests, pyarrow, etc.)
 │   ├── raw/                   # [Ignorado no Git] Armazena arquivos CSVs/Zips brutos do TSE
-│   ├── output/                # JSONs finais particionados por UF (gerados pelo script)
-│   │   ├── summary.json       # Resumo consolidado nacional
-│   │   └── states/            # JSONs individuais por estado (ex: SP.json, RJ.json)
 │   └── process_tse.py         # Script principal de limpeza, agregação e cruzamento de dados
 │
 └── src/                       # Código-fonte da aplicação Mobile-First PWA
@@ -57,7 +59,7 @@ eleicoes-analise-mobile/
 
 ### 1. Camada ETL (`/etl`)
 * **`raw/`**: Diretório reservado para o download temporário das bases brutas de Boletins de Urna e Votação por Seção do TSE.
-* **`output/`**: Local de destino do dataset processado. Os arquivos aqui gerados serão publicados na CDN para consumo da aplicação frontend.
+* **`public/data/`**: Destino dos JSONs processados para servir como arquivos estáticos do frontend e publicação na CDN.
 * **`process_tse.py`**: Converte os arquivos CSV gigantescos em arquivos JSON ultraleves particionados por estado, realizando o cálculo da variação entre turnos e marcando as seções encerradas após as 17h.
 
 ### 2. Camada Frontend (`/src`)

@@ -1,4 +1,4 @@
-# Fases do Projeto — Análise Eleitoral 2022
+# Fases do Projeto — Análise Eleitoral 2026
 
 Este roteiro organiza o desenvolvimento em ordem estritamente sequencial. Conclua os itens de uma fase e verifique seus critérios de aceite antes de iniciar a fase seguinte.
 
@@ -10,25 +10,25 @@ Este roteiro organiza o desenvolvimento em ordem estritamente sequencial. Conclu
 
 ## Fase 1 — Preparação do projeto e do ambiente
 
-- [x] Confirmar o objetivo do produto: PWA mobile-first para análise comparativa do 1º e 2º turnos das Eleições Presidenciais de 2022.
+- [x] Confirmar o objetivo do produto: PWA mobile-first para análise comparativa do 1º e 2º turnos das Eleições Presidenciais de 2026.
 - [x] Revisar os documentos de arquitetura, estrutura de diretórios, contrato de dados/design system e instruções para agente de IA.
 - [x] Confirmar e registrar a estrutura de trabalho prevista: raiz do projeto, `etl/` e `src/`.
 - [x] Definir versões compatíveis de Node.js e Python e registrá-las na documentação do projeto.
 - [x] Criar e configurar o repositório Git e o `.gitignore`, excluindo arquivos brutos do TSE, ambientes virtuais, dependências instaladas e saídas temporárias.
-- [x] Criar a estrutura de diretórios descrita em `estrutura_de_pastas_e_diretorios.md`, incluindo `etl/raw/`, `etl/output/states/` e as pastas previstas de `src/`.
-- [x] Criar o `README.md` com visão geral, pré-requisitos e instruções de instalação; registrar execução e testes como pendentes até existirem os arquivos de configuração.
-- [ ] Registrar comandos reproduzíveis para instalar dependências e executar cada parte do projeto.
+- [x] Criar a estrutura de diretórios descrita em `estrutura_de_pastas_e_diretorios.md`, incluindo `etl/raw/`, `public/data/states/` e as pastas previstas de `src/`.
+- [x] Criar o `README.md` com visão geral, pré-requisitos e instruções reproduzíveis de instalação, execução e testes do ETL.
+- [x] Registrar comandos reproduzíveis para instalar dependências e executar cada parte do projeto.
 
 **Critérios de aceite da Fase 1**
 
 - [x] A estrutura necessária existe na raiz correta e corresponde à documentação, sem incluir dados brutos no Git.
-- [ ] As versões de runtime e os comandos de instalação/execução estão documentados e podem ser seguidos em um ambiente limpo.
+- [x] As versões de runtime e os comandos de instalação/execução estão documentados e podem ser seguidos em um ambiente limpo.
 - [x] O repositório está inicializado e as regras de exclusão protegem arquivos brutos, ambientes locais e artefatos gerados.
 - [x] Os documentos de referência foram revisados; qualquer divergência ou documento ausente foi registrado antes de continuar.
 
 ## Fase 2 — Especificação e preparação dos dados de origem
 
-- [ ] Identificar e obter as bases oficiais do TSE necessárias: votação por seção nos dois turnos e Boletins de Urna com horários do 2º turno.
+- [ ] Identificar e obter as bases oficiais do TSE das Eleições Presidenciais de 2026 necessárias: votação por seção nos dois turnos e Boletins de Urna com horários do 2º turno.
 - [ ] Guardar arquivos originais em `etl/raw/`, preservando-os sem alterações e mantendo-os fora do controle de versão.
 - [ ] Registrar origem, data de obtenção, período, formato, codificação e eventuais limitações de cada arquivo.
 - [ ] Inspecionar colunas, tipos, valores ausentes, duplicidades, chaves e granularidade dos arquivos antes de implementar os cálculos.
@@ -54,8 +54,8 @@ Este roteiro organiza o desenvolvimento em ordem estritamente sequencial. Conclu
 - [x] Calcular aptos, válidos, votos nominais, demais candidatos, brancos, nulos e abstenções de acordo com os dados disponíveis e o contrato.
 - [x] Identificar municípios em que o vencedor mudou entre os turnos e gerar a lista de viradas com os campos definidos no contrato.
 - [x] Identificar seções do 2º turno com `DH_GERACAO` posterior às 17:00:00 e agregar totais de seções e votos por município, estado e Brasil.
-- [x] Gerar `etl/output/summary.json` com totais nacionais e lista de UFs; os arquivos atuais usam dados sintéticos identificados como demo.
-- [x] Gerar `etl/output/states/{UF}.json` para cada UF, contendo totais, viradas e dados municipais de acordo com o esquema canônico; os arquivos atuais usam dados sintéticos identificados como demo.
+- [x] Gerar `public/data/summary.json` com totais nacionais e lista de UFs; os arquivos atuais usam dados sintéticos identificados como demo.
+- [x] Gerar `public/data/states/{UF}.json` para cada UF, contendo totais, viradas e dados municipais de acordo com o esquema canônico; os arquivos atuais usam dados sintéticos identificados como demo.
 - [x] Garantir serialização JSON válida, codificação UTF-8, identificadores consistentes e valores numéricos nos campos quantitativos.
 - [x] Exibir logs informativos sobre etapas, arquivos processados, contagens, validações e erros; falhas de processamento devem retornar erro explícito.
 - [x] Tornar a execução reproduzível, documentando o comando e evitando depender de estado manual não registrado.
@@ -67,61 +67,64 @@ Este roteiro organiza o desenvolvimento em ordem estritamente sequencial. Conclu
 - [x] Totais nacionais e estaduais reconciliam-se com as agregações de origem segundo as regras documentadas.
 - [x] Cruzamento entre turnos, identificação de viradas e regra de pós-17h passam por verificações com casos conhecidos ou dados de teste controlados.
 - [x] O processo informa erros de entrada ou processamento sem produzir saídas aparentando sucesso quando os dados estão inválidos.
-- [x] Os arquivos gerados estão em `etl/output/` e os dados brutos permanecem fora do controle de versão.
+- [x] Os arquivos gerados estão em `public/data/` e os dados brutos permanecem fora do controle de versão.
 
 ## Fase 4 — Testes e congelamento do contrato de dados
 
-- [ ] Criar testes automatizados para parsing, limpeza, cruzamento entre turnos, totais, viradas e classificação pós-17h.
-- [ ] Criar dados de teste pequenos e controlados para cobrir valores ausentes, duplicidades, limites de horário e municípios sem virada.
-- [ ] Validar `summary.json` e arquivos estaduais contra o contrato, incluindo tipos, campos obrigatórios e códigos de UF.
-- [ ] Confirmar coerência entre nomes/formatos produzidos pelo ETL e as interfaces TypeScript previstas em `src/types/tse.ts`.
-- [ ] Registrar no contrato ou na documentação qualquer decisão necessária para resolver inconsistências entre exemplos de esquema.
+- [x] Criar testes automatizados para parsing, limpeza, cruzamento entre turnos, totais, viradas e classificação pós-17h.
+- [x] Criar dados de teste pequenos e controlados para cobrir valores ausentes, duplicidades, limites de horário e municípios sem virada.
+- [x] Validar `summary.json` e arquivos estaduais contra o contrato, incluindo tipos, campos obrigatórios e códigos de UF.
+- [x] Confirmar coerência entre nomes/formatos produzidos pelo ETL e as interfaces TypeScript previstas em `src/types/tse.ts`.
+- [x] Registrar no contrato ou na documentação qualquer decisão necessária para resolver inconsistências entre exemplos de esquema.
 
 **Critérios de aceite da Fase 4**
 
-- [ ] Os testes do ETL passam e exercitam os casos de fronteira relevantes.
-- [ ] Os artefatos produzidos são compatíveis com os tipos e formatos que o frontend consumirá, sem adaptações silenciosas ou campos ambíguos.
-- [ ] O contrato de dados está suficientemente estável para iniciar a implementação do frontend.
+- [x] Os testes do ETL passam e exercitam os casos de fronteira relevantes.
+- [x] Os artefatos produzidos são compatíveis com os tipos e formatos que o frontend consumirá, sem adaptações silenciosas ou campos ambíguos.
+- [x] O contrato de dados está suficientemente estável para iniciar a implementação do frontend.
 
 ## Fase 5 — Configuração do frontend React PWA
 
-- [ ] Criar o aplicativo React com Vite e TypeScript na raiz, respeitando a estrutura documentada.
-- [ ] Configurar TailwindCSS, Lucide-React, Recharts e o plugin/recursos necessários para PWA.
-- [ ] Configurar scripts de desenvolvimento, build, lint e testes no `package.json`.
-- [ ] Criar `src/types/tse.ts` de acordo com o contrato de dados congelado.
-- [ ] Criar `src/data/ufs.ts` com metadados de estados, regiões e códigos TSE necessários à interface.
-- [ ] Criar mocks tipados representativos do contrato para desenvolvimento e testes da UI, sem substituir ou confundir os dados reais do ETL.
-- [ ] Configurar `src/main.tsx`, `src/App.tsx` e `src/index.css`, incluindo estilos globais e diretivas do TailwindCSS.
-- [ ] Implementar a estrutura visual mobile-first e validar o layout nas larguras de 360px a 430px.
-- [ ] Aplicar as cores do design system para candidatos, brancos/nulos, abstenção, pós-17h, fundo e superfícies.
+- [x] Criar o aplicativo React com Vite e TypeScript na raiz, respeitando a estrutura documentada.
+- [x] Configurar TailwindCSS, Lucide-React, Recharts e o plugin/recursos necessários para PWA.
+- [x] Configurar scripts de desenvolvimento, build e preview no `package.json`.
+- [x] Adicionar scripts e configuração de lint e testes automatizados do frontend.
+- [x] Criar `src/types/tse.ts` de acordo com o contrato de dados congelado e os campos atualmente emitidos pelo ETL.
+- [x] Criar `src/data/ufs.ts` com metadados de estados, regiões e códigos TSE necessários à interface.
+- [x] Criar dados sintéticos representativos do contrato para demonstração e testes da UI, identificados como demo e sem confundi-los com dados oficiais.
+- [x] Configurar `src/main.tsx`, `src/App.tsx` e `src/index.css`, incluindo estilos globais e diretivas do TailwindCSS.
+- [x] Implementar a estrutura inicial mobile-first e validar o layout em 360px, 390px e 430px, sem rolagem horizontal e com controles de navegação acima de 48px.
+- [x] Aplicar as cores do design system para candidatos, brancos/nulos, abstenção, pós-17h, fundo e superfícies.
 
 **Critérios de aceite da Fase 5**
 
-- [ ] O frontend inicia localmente e compila com TypeScript sem erros.
-- [ ] Os tipos correspondem ao esquema JSON real e os mocks respeitam esses tipos.
-- [ ] O layout é utilizável em viewports de 360px a 430px e usa as cores definidas no design system.
+- [x] O frontend inicia localmente e compila com TypeScript sem erros.
+- [x] Os tipos correspondem ao esquema JSON real e os mocks respeitam esses tipos.
+- [x] O layout é utilizável em viewports de 360px a 430px e usa as cores definidas no design system.
 
 ## Fase 6 — Componentes e funcionalidades da aplicação
 
-- [ ] Implementar Header compacto e barra inferior fixa com as quatro áreas: Visão Geral, Abstenções & Nulos, Viradas e Análise Pós-17h.
-- [ ] Garantir alvos de toque de no mínimo 48px × 48px para botões, links e controles navegáveis.
-- [ ] Implementar componentes comuns, cards de métricas, estados de carregamento, estados vazios e mensagens de erro.
-- [ ] Implementar Bottom Sheets para seleção de UF e município, com controles acessíveis e utilizáveis em telas pequenas.
-- [ ] Implementar `Overview.tsx` para comparação nacional/estadual dos dois turnos.
-- [ ] Implementar `Turnout.tsx` para análise de brancos, nulos e abstenções.
-- [ ] Implementar `Flips.tsx` para consulta de municípios com mudança de vencedor.
-- [ ] Implementar `Post17h.tsx` para análise de seções e votos apurados após as 17h.
-- [ ] Implementar gráficos Recharts com barras horizontais, tooltips utilizáveis por toque e apresentação compatível com telas estreitas.
-- [ ] Implementar formatadores de números e porcentagens, abreviando valores grandes (por exemplo, 1,5M e 250k).
-- [ ] Implementar cálculos auxiliares em `src/utils/analytics.ts` somente quando não forem responsabilidade do ETL.
-- [ ] Testar navegação, filtros e exibição de dados em todas as quatro áreas com mocks tipados.
+- [x] Implementar Header compacto e barra inferior fixa com as quatro áreas: Visão Geral, Abstenções & Nulos, Viradas e Análise Pós-17h.
+- [x] Garantir alvos de toque de no mínimo 48px × 48px para botões, links e controles navegáveis.
+- [x] Implementar componentes comuns, cards de métricas, estados vazios e mensagem explícita para JSON estadual indisponível.
+- [x] Implementar estados de carregamento e mensagens amigáveis para operações assíncronas de dados.
+- [x] Implementar Bottom Sheets para seleção de UF e município, com controles acessíveis e utilizáveis em telas pequenas.
+- [x] Implementar `Overview.tsx` para comparação nacional/estadual/municipal dos dois turnos.
+- [x] Implementar `Turnout.tsx` para análise de brancos, nulos e abstenções.
+- [x] Implementar `Flips.tsx` para consulta de municípios com mudança de vencedor.
+- [x] Implementar `Post17h.tsx` para análise de seções e votos apurados após as 17h.
+- [x] Implementar gráficos Recharts com barras horizontais, tooltips utilizáveis por toque e apresentação compatível com telas estreitas.
+- [x] Implementar formatadores de números e porcentagens, abreviando valores grandes (por exemplo, 1,5M e 250k).
+- [x] Manter cálculos de domínio no ETL e cálculos de apresentação/percentuais em `src/utils/formatters.ts`; não duplicar cálculos de domínio em `analytics.ts`.
+- [x] Testar navegação, filtros de estado/município e exibição de dados nas quatro áreas; a aplicação consome os JSONs sintéticos gerados pelo ETL de acordo com as interfaces tipadas.
 
 **Critérios de aceite da Fase 6**
 
-- [ ] As quatro áreas estão acessíveis pela navegação inferior fixa e apresentam seus dados e estados de interface previstos.
-- [ ] Todos os controles atendem ao mínimo de 48px × 48px e os Bottom Sheets permitem selecionar UF e município.
-- [ ] Gráficos e números são legíveis em telas de 360px a 430px, sem truncamento que impeça a interpretação.
-- [ ] As interações de toque, filtros, formatação e estados vazios/erro foram verificadas nos fluxos principais.
+- [x] As quatro áreas estão acessíveis pela navegação inferior fixa e apresentam dados sintéticos do ETL e estados vazios previstos.
+- [x] Todos os controles atendem ao mínimo de 48px × 48px e os Bottom Sheets permitem selecionar UF e município.
+- [x] Gráficos e números são legíveis em telas de 360px a 430px, sem overflow horizontal que impeça a interpretação.
+- [x] Verificar navegação, filtros, formatação, estados vazios e ausência de arquivo estadual nos fluxos principais.
+- [x] Verificar carregamento assíncrono do resumo e dos dados estaduais sob demanda, incluindo falhas e novas tentativas.
 
 ## Fase 7 — Integração entre frontend e dados do ETL
 

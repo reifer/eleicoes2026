@@ -1,6 +1,6 @@
-# Análise Eleitoral 2022 — Mobile-First PWA
+# Análise Eleitoral 2026 — Mobile-First PWA
 
-Aplicação web progressiva para análise comparativa dos resultados do 1º e 2º turnos das Eleições Presidenciais de 2022 no Brasil. O projeto combina um pipeline ETL offline em Python, que processa arquivos oficiais do TSE e produz JSONs particionados, com uma aplicação React PWA mobile-first que consome esses dados estáticos.
+Aplicação web progressiva para análise comparativa dos resultados do 1º e 2º turnos das Eleições Presidenciais de 2026 no Brasil. O projeto combina um pipeline ETL offline em Python, que processa arquivos oficiais do TSE e produz JSONs particionados, com uma aplicação React PWA mobile-first que consome esses dados estáticos.
 
 As análises previstas incluem votos por candidato, brancos e nulos, abstenções, municípios em que houve virada do vencedor e votos/seções associados a boletins gerados após as 17h no 2º turno. A aplicação deve priorizar telas entre 360px e 430px e carregar os dados estaduais sob demanda.
 
@@ -8,7 +8,7 @@ As análises previstas incluem votos por candidato, brancos e nulos, abstençõe
 
 - `etl/raw/`: arquivos originais do TSE; ignorados pelo Git.
 - `etl/process_tse.py`: ponto de entrada previsto para o processamento ETL.
-- `etl/output/`: destino previsto dos JSONs gerados, incluindo `summary.json` e `states/{UF}.json`.
+- `public/data/`: JSONs estáticos publicados pelo Vite, incluindo `summary.json` e `states/{UF}.json`.
 - `src/`: aplicação React, componentes, páginas, hooks, tipos e utilitários.
 - `arquitetura_do_sistema.md`, `contrato_de_dados_e_design_system.md` e `estrutura_de_pastas_e_diretorios.md`: especificações de referência.
 - `FasesdoProjeto.md`: sequência de implementação e critérios de aceite.
@@ -19,7 +19,7 @@ As análises previstas incluem votos por candidato, brancos e nulos, abstençõe
 - Node.js 20 ou superior e npm, para o frontend.
 - Python 3.10 ou superior e `venv`, para o ETL.
 
-O ETL usa Python e Pandas. A configuração do frontend será adicionada quando o aplicativo React/Vite for iniciado; ainda não há `package.json`.
+O ETL usa Python e Pandas. O frontend usa React, TypeScript, Vite, TailwindCSS, Lucide, Recharts e o plugin PWA do Vite.
 
 ## Instalação e preparação do ambiente
 
@@ -51,9 +51,40 @@ Instale as dependências do ETL:
 python -m pip install -r etl/requirements.txt
 ```
 
-### Frontend
+### Frontend React PWA
 
-O frontend ainda não tem `package.json`; portanto, a instalação e execução do React serão documentadas quando essa etapa começar.
+Instale as dependências Node:
+
+```bash
+npm install
+```
+
+Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+Verifique os tipos e gere o build de produção:
+
+```bash
+npm run build
+```
+
+Execute a checagem estática e os testes do frontend:
+
+```bash
+npm run lint
+npm test
+```
+
+Os dados de demonstração ficam em `public/data/summary.json` e `public/data/states/*.json` e são carregados por requisições HTTP. Regere esses arquivos com `python etl/process_tse.py --demo` antes de executar `npm run dev` ou `npm run build` se precisar recriar os dados sintéticos.
+
+Para servir localmente o build:
+
+```bash
+npm run preview
+```
 
 ## Dados e execução
 
@@ -67,7 +98,7 @@ Para exercitar o pipeline antes de obter os arquivos de origem:
 python etl/process_tse.py --demo
 ```
 
-Os valores são fictícios e os JSONs indicam `"data_source": "demo"`. Não use nem publique esses números como resultados oficiais.
+Os valores são fictícios e os JSONs indicam `"data_source": "demo"`. Não use nem publique esses números como resultados oficiais de 2026.
 
 ### Processar arquivos TSE
 
@@ -93,8 +124,8 @@ Por padrão, CSVs usam separador `;` e codificação `latin-1`. Ajuste com `--de
 
 O script grava as saídas:
 
-- `etl/output/summary.json`: totais nacionais e lista de UFs.
-- `etl/output/states/{UF}.json`: totais e dados municipais da UF.
+- `public/data/summary.json`: totais nacionais e lista de UFs.
+- `public/data/states/{UF}.json`: totais e dados municipais da UF.
 
 Os dados de aptos e abstenção são lidos da fonte de comparecimento, pois não são inferidos dos votos por candidato. O ETL valida os arquivos e as chaves de seção, os campos do contrato e a reconciliação dos totais nacionais com as partições estaduais antes de gravar.
 
@@ -106,7 +137,7 @@ Execute os testes automatizados do ETL com:
 python -m unittest discover -s etl -p 'test_*.py' -v
 ```
 
-O frontend consumirá o resumo na inicialização e carregará cada JSON estadual sob demanda. As instruções de build e publicação serão adicionadas quando o frontend estiver implementado.
+O frontend busca o resumo nacional na inicialização e carrega cada JSON estadual sob demanda pela URL `/data/states/{UF}.json`. A interface mantém cache em memória durante a sessão, permite tentar novamente em caso de falha e nunca baixa automaticamente todos os arquivos estaduais. As instruções de publicação serão adicionadas quando a configuração de deploy for definida.
 
 ## Documentação
 

@@ -27,7 +27,7 @@ import pandas as pd
 LOGGER = logging.getLogger("process_tse")
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RAW = ROOT / "etl" / "raw"
-DEFAULT_OUTPUT = ROOT / "etl" / "output"
+DEFAULT_OUTPUT = ROOT / "public" / "data"
 SECTION_KEYS = ["sg_uf", "cd_municipio", "nr_zona", "nr_secao"]
 MUNICIPAL_KEYS = ["sg_uf", "cd_municipio"]
 UF_NAMES = {
@@ -98,18 +98,24 @@ def _column_map(columns: Iterable[str], aliases: dict[str, tuple[str, ...]], req
     return mapped
 
 
-def _csv_chunks(path: Path, delimiter: str, encoding: str, chunksize: int = 250_000):
+def _csv_chunks(
+    path: Path,
+    delimiter: str,
+    encoding: str,
+    chunksize: int = 250_000,
+) -> Iterable[pd.DataFrame]:
     if not path.is_file():
         raise EtlError(f"Arquivo de entrada não encontrado: {path}")
     try:
-        return pd.read_csv(
-            path,
-            sep=delimiter,
-            dtype=str,
-            encoding=encoding,
-            chunksize=chunksize,
-            keep_default_na=False,
-        )
+        with pd.read_csv(
+                path,
+                sep=delimiter,
+                dtype=str,
+                encoding=encoding,
+                chunksize=chunksize,
+                keep_default_na=False,
+        ) as reader:
+            yield from reader
     except (OSError, pd.errors.ParserError, UnicodeError) as exc:
         raise EtlError(f"Não foi possível abrir CSV {path}: {exc}") from exc
 

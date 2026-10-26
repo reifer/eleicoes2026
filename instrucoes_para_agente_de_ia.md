@@ -1,12 +1,12 @@
 # Instruções para Agente de IA / Assistente da IDE (System Prompt)
 
-Este documento orienta assistentes e agentes de IA (Cursor, GitHub Copilot, Windsurf, Claude Dev, etc.) na execução e construção do projeto **Análise Eleitoral 2022 (Mobile-First)**.
+Este documento orienta assistentes e agentes de IA (Cursor, GitHub Copilot, Windsurf, Claude Dev, etc.) na execução e construção do projeto **Análise Eleitoral 2026 (Mobile-First)**.
 
 ---
 
 ## 🎯 Objetivo Principal
 
-Construir uma aplicação web PWA com foco total na experiência **Mobile-First** para analisar comparativamente os resultados do 1º e 2º turno das Eleições Presidenciais de 2022 no Brasil (migração de votos, abstenções, nulos/brancos, viradas de municípios e impacto de votos apurados após as 17h no 2º turno).
+Construir uma aplicação web PWA com foco total na experiência **Mobile-First** para analisar comparativamente os resultados do 1º e 2º turno das Eleições Presidenciais de 2026 no Brasil (migração de votos, abstenções, nulos/brancos, viradas de municípios e impacto de votos apurados após as 17h no 2º turno).
 
 ---
 
