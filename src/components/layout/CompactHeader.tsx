@@ -4,7 +4,7 @@ import type { UfSummary } from '../../types/tse';
 interface CompactHeaderProps {
   state?: UfSummary;
   municipality?: string;
-  dataSource: 'demo' | 'tse';
+  dataSource?: 'demo' | 'tse';
   canSelectMunicipality: boolean;
   onSelectState: () => void;
   onSelectMunicipality: () => void;

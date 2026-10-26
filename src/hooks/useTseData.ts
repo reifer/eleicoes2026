@@ -13,6 +13,7 @@ import type {
 } from '../types/tse';
 
 const UF_SIGLAS = new Set<string>(UF_BY_SIGLA.keys());
+const inFlightJsonRequests = new Map<string, Promise<unknown>>();
 
 type RequestStatus = 'loading' | 'success' | 'error';
 type StateRequestStatus = 'idle' | RequestStatus;
@@ -100,9 +101,12 @@ function isSummaryData(value: unknown): value is SummaryData {
   return typeof value.updated_at === 'string'
     && isRecord(value.totais_brasil)
     && isTurnoData(value.totais_brasil.t1)
+    && value.totais_brasil.t1.aptos > 0
     && isTurnoData(value.totais_brasil.t2)
+    && value.totais_brasil.t2.aptos > 0
     && isNationalPost17hData(value.pos_17h_brasil)
     && Array.isArray(value.ufs)
+    && value.ufs.length > 0
     && value.ufs.every(isUfSummary)
     && isDataSource(value.data_source);
 }
@@ -111,25 +115,30 @@ function isStateData(value: unknown, expectedUf: UfSigla): value is StateData {
   if (!isRecord(value)) return false;
   return value.uf === expectedUf
     && typeof value.nome_estado === 'string'
+    && Number.isInteger(value.total_municipios)
     && isNonNegativeNumber(value.total_municipios)
+    && value.total_municipios > 0
     && isRecord(value.totais)
     && isTurnoData(value.totais.t1)
+    && value.totais.t1.aptos > 0
     && isTurnoData(value.totais.t2)
+    && value.totais.t2.aptos > 0
     && isNationalPost17hData(value.pos_17h)
     && Array.isArray(value.viradas_municipios)
     && value.viradas_municipios.every(isViradaMunicipio)
     && Array.isArray(value.municipios)
+    && value.municipios.length === value.total_municipios
     && value.municipios.every(isMunicipio)
     && isDataSource(value.data_source);
 }
 
-async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
+async function fetchJson(url: string): Promise<unknown> {
   let response: Response;
   try {
-    response = await fetch(url, { signal });
+    response = await fetch(url);
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      throw error;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw new Error('Você está offline e não há uma cópia deste arquivo disponível no cache.', { cause: error });
     }
     throw new Error('Não foi possível conectar ao servidor de dados. Verifique sua conexão e tente novamente.', { cause: error });
   }
@@ -146,6 +155,17 @@ async function fetchJson(url: string, signal: AbortSignal): Promise<unknown> {
   }
 }
 
+function requestJson(url: string): Promise<unknown> {
+  const existingRequest = inFlightJsonRequests.get(url);
+  if (existingRequest) return existingRequest;
+
+  const request = fetchJson(url).finally(() => {
+    if (inFlightJsonRequests.get(url) === request) inFlightJsonRequests.delete(url);
+  });
+  inFlightJsonRequests.set(url, request);
+  return request;
+}
+
 function dataUrl(path: string): string {
   return `${import.meta.env.BASE_URL}${path}`;
 }
@@ -160,9 +180,9 @@ export function useTseData(selectedUf?: UfSigla): UseTseDataResult {
   const [stateRetry, setStateRetry] = useState(0);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let isActive = true;
 
-    fetchJson(dataUrl('data/summary.json'), controller.signal)
+    requestJson(dataUrl('data/summary.json'))
       .then((data) => {
         if (!isSummaryData(data)) {
           throw new Error('O resumo recebido não corresponde ao contrato de dados esperado.');
@@ -170,16 +190,19 @@ export function useTseData(selectedUf?: UfSigla): UseTseDataResult {
         return data;
       })
       .then((data) => {
+        if (!isActive) return;
         setSummary(data);
         setSummaryStatus('success');
       })
       .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
+        if (!isActive) return;
         setSummaryError(error instanceof Error ? error.message : 'Falha inesperada ao carregar o resumo.');
         setSummaryStatus('error');
       });
 
-    return () => controller.abort();
+    return () => {
+      isActive = false;
+    };
   }, [summaryRetry]);
 
   useEffect(() => {
@@ -189,9 +212,9 @@ export function useTseData(selectedUf?: UfSigla): UseTseDataResult {
 
     if (stateCache.has(selectedUf) || !summary?.ufs.some((uf) => uf.sigla === selectedUf)) return undefined;
 
-    const controller = new AbortController();
+    let isActive = true;
 
-    fetchJson(dataUrl(`data/states/${selectedUf}.json`), controller.signal)
+    requestJson(dataUrl(`data/states/${selectedUf}.json`))
       .then((data) => {
         if (!isStateData(data, selectedUf)) {
           throw new Error(`O arquivo estadual de ${selectedUf} não corresponde ao contrato de dados.`);
@@ -199,10 +222,11 @@ export function useTseData(selectedUf?: UfSigla): UseTseDataResult {
         return data;
       })
       .then((data) => {
+        if (!isActive) return;
         setStateCache((cache) => new Map(cache).set(selectedUf, data));
       })
       .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
+        if (!isActive) return;
         setStateRequest({
           uf: selectedUf,
           status: 'error',
@@ -210,7 +234,9 @@ export function useTseData(selectedUf?: UfSigla): UseTseDataResult {
         });
       });
 
-    return () => controller.abort();
+    return () => {
+      isActive = false;
+    };
   }, [selectedUf, stateRetry, stateCache, summary, summaryStatus]);
 
   const retrySummary = useCallback(() => {

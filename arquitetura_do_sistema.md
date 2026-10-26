@@ -120,7 +120,7 @@ Para otimizar a experiência mobile e evitar downloads pesados via redes móveis
 
 3. **Performance & PWA:**
    * Manifest WebApp configurado (`display: standalone`) para instalação na tela inicial do smartphone.
-   * Service Worker pré-carregando o arquivo `summary.json` e os dados do estado ativo para navegação instantânea.
+   * Service Worker pré-cacheando `summary.json` e usando Network First para os JSONs estaduais solicitados; estados acessados ficam disponíveis offline por até 30 dias, enquanto estados sem cache exibem uma mensagem de indisponibilidade.
 
 ---
 

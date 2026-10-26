@@ -8,11 +8,11 @@ interface MetricCardProps {
 }
 
 const toneClasses: Record<MetricCardProps['tone'], string> = {
-  lula: 'border-lula/30 bg-red-50 text-lula',
-  bolsonaro: 'border-bolsonaro/30 bg-blue-50 text-bolsonaro',
-  neutral: 'border-neutraldata/30 bg-slate-100 text-neutraldata',
-  abstencao: 'border-abstencao/30 bg-orange-50 text-abstencao',
-  post17h: 'border-post17h/30 bg-purple-50 text-post17h',
+  lula: 'border-lula/30 bg-red-50 text-red-800',
+  bolsonaro: 'border-bolsonaro/30 bg-blue-50 text-blue-800',
+  neutral: 'border-neutraldata/30 bg-slate-100 text-slate-700',
+  abstencao: 'border-abstencao/30 bg-orange-50 text-orange-800',
+  post17h: 'border-post17h/30 bg-purple-50 text-[#6B46C1]',
 };
 
 export function MetricCard({ label, value, detail, tone }: MetricCardProps) {

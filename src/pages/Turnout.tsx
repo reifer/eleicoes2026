@@ -13,7 +13,7 @@ export function Turnout({ first, second, scopeLabel }: TurnoutProps) {
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-sm font-semibold text-abstencao">Abstenções, brancos e nulos · {scopeLabel}</p>
+        <p className="text-sm font-semibold text-orange-800">Abstenções, brancos e nulos · {scopeLabel}</p>
         <h2 className="mt-1 text-2xl font-bold text-slate-900">Comparecimento e votos não válidos</h2>
       </div>
       <div className="grid grid-cols-2 gap-3">

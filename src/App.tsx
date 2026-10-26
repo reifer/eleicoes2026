@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { BottomSheet } from './components/common/BottomSheet';
 import { DataError } from './components/common/DataError';
 import { LoadingStatus } from './components/common/LoadingStatus';
+import { OfflineNotice } from './components/common/OfflineNotice';
 import { BottomNavigation, type ViewId } from './components/layout/BottomNavigation';
 import { CompactHeader } from './components/layout/CompactHeader';
 import { UFS } from './data/ufs';
@@ -154,10 +155,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-app text-slate-900">
+      <OfflineNotice />
       <CompactHeader
         state={selectedUfSummary}
         municipality={currentMunicipality?.nome}
-        dataSource={summary?.data_source ?? 'demo'}
+        dataSource={summary?.data_source}
         canSelectMunicipality={stateStatus === 'success' && Boolean(currentState)}
         onSelectState={() => setSheetMode('state')}
         onSelectMunicipality={() => setSheetMode('municipality')}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 export interface SheetOption {
@@ -26,14 +26,40 @@ export function BottomSheet({
   onSelect,
   onClose,
 }: BottomSheetProps) {
+  const dialogRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     if (!open) return undefined;
 
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+    const dialog = dialogRef.current;
+    const focusableElements = dialog?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    focusableElements?.[0]?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab' || !focusableElements?.length) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      previousFocus?.focus();
+    };
   }, [onClose, open]);
 
   if (!open) return null;
@@ -49,6 +75,7 @@ export function BottomSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="bottom-sheet-title"
+        ref={dialogRef}
         className="sheet-enter max-h-[min(80vh,38rem)] w-full overflow-hidden rounded-t-3xl bg-white shadow-2xl"
       >
         <div className="mx-auto max-w-2xl">
@@ -74,7 +101,7 @@ export function BottomSheet({
                   aria-pressed={option.value === selectedValue}
                   onClick={() => onSelect(option.value)}
                   className={`flex min-h-12 w-full items-center justify-between rounded-xl px-4 py-3 text-left hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-post17h ${
-                    option.value === selectedValue ? 'bg-purple-50 text-post17h' : 'text-slate-800'
+                    option.value === selectedValue ? 'bg-purple-50 text-[#6B46C1]' : 'text-slate-800'
                   }`}
                 >
                   <span>

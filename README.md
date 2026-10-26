@@ -137,7 +137,9 @@ Execute os testes automatizados do ETL com:
 python -m unittest discover -s etl -p 'test_*.py' -v
 ```
 
-O frontend busca o resumo nacional na inicialização e carrega cada JSON estadual sob demanda pela URL `/data/states/{UF}.json`. A interface mantém cache em memória durante a sessão, permite tentar novamente em caso de falha e nunca baixa automaticamente todos os arquivos estaduais. As instruções de publicação serão adicionadas quando a configuração de deploy for definida.
+O frontend busca o resumo nacional na inicialização e carrega cada JSON estadual sob demanda pela URL `/data/states/{UF}.json`. A interface mantém cache em memória durante a sessão, permite tentar novamente em caso de falha e nunca baixa automaticamente todos os arquivos estaduais. No PWA, o resumo é pré-cacheado com revisão derivada do conteúdo; arquivos estaduais usam estratégia Network First e ficam disponíveis offline após o primeiro acesso (máximo de 27 arquivos por até 30 dias). Quando estiver sem conexão, a interface avisa que dados em cache podem estar desatualizados e que estados ainda não armazenados não poderão ser abertos.
+
+O manifesto PWA é gerado pelo plugin Vite a partir de `vite.config.ts` e inclui ícones PNG de 192px e 512px. O modo standalone e o Service Worker são servidos em HTTPS ou em `localhost`; os dados de demonstração continuam identificados como sintéticos e não são resultados oficiais.
 
 ## Documentação
 

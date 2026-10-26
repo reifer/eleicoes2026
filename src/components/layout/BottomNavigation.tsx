@@ -27,10 +27,11 @@ export function BottomNavigation({ activeView, onChange }: BottomNavigationProps
             <li key={id}>
               <button
                 type="button"
+                aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => onChange(id)}
                 className={`flex min-h-12 w-full flex-col items-center justify-center gap-1 px-1 py-2 text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-post17h ${
-                  active ? 'font-semibold text-post17h' : 'text-slate-600 hover:text-slate-900'
+                  active ? 'font-semibold text-[#6B46C1]' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Icon aria-hidden="true" size={20} />

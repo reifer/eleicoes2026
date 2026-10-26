@@ -128,36 +128,36 @@ Este roteiro organiza o desenvolvimento em ordem estritamente sequencial. Conclu
 
 ## Fase 7 — Integração entre frontend e dados do ETL
 
-- [ ] Implementar em `src/hooks/useTseData.ts` o carregamento inicial de `summary.json`.
-- [ ] Implementar carregamento sob demanda de `states/{UF}.json` quando uma UF for selecionada.
-- [ ] Implementar cache local dos dados carregados usando `src/hooks/useLocalStorage.ts` ou a estratégia acordada.
-- [ ] Tratar carregamento, falhas de rede, JSON inválido, UF inexistente e ausência de dados sem apresentar resultados como se fossem válidos.
-- [ ] Ligar filtros e páginas aos dados reais gerados pelo ETL e remover dependências de mocks nos caminhos de produção.
-- [ ] Verificar que as agregações e os indicadores exibidos correspondem aos valores presentes nos JSONs.
+- [x] Implementar em `src/hooks/useTseData.ts` o carregamento inicial HTTP de `summary.json`, com deduplicação de requisições simultâneas.
+- [x] Implementar carregamento sob demanda de `states/{UF}.json` somente quando uma UF disponível no resumo for selecionada.
+- [x] Implementar cache em memória por UF durante a sessão; o Service Worker fornece persistência offline dos estados já solicitados.
+- [x] Tratar carregamento, falhas de rede, JSON inválido, UF inexistente e respostas sem dados sem apresentar resultados como se fossem válidos.
+- [x] Ligar filtros e páginas aos artefatos JSON publicados em `public/data/`; não há importação de mocks no caminho de produção, e os arquivos demo mantêm identificação explícita como dados sintéticos.
+- [x] Verificar que métricas, viradas e filtros municipais exibidos correspondem aos valores dos JSONs do ETL por testes de integração.
 
 **Critérios de aceite da Fase 7**
 
-- [ ] A aplicação carrega o resumo nacional na inicialização e solicita dados estaduais somente quando necessários.
-- [ ] Dados válidos aparecem nas telas corretas, e falhas de leitura são comunicadas explicitamente.
-- [ ] Cache local funciona sem quebrar a atualização, a seleção de UF ou a integridade dos dados.
-- [ ] A interface de produção consome os artefatos do ETL, não os mocks.
+- [x] A aplicação carrega o resumo nacional na inicialização e solicita dados estaduais somente quando necessários.
+- [x] Dados válidos aparecem nas telas corretas, e falhas de leitura são comunicadas explicitamente.
+- [x] Cache em memória e cache offline do Service Worker funcionam sem quebrar a seleção de UF ou a validação dos dados.
+- [x] A interface de produção consome os artefatos publicados pelo ETL, não módulos de mocks.
 
 ## Fase 8 — PWA, acessibilidade e desempenho
 
-- [ ] Configurar o Web App Manifest com nome, ícones, cores e `display: standalone`.
-- [ ] Configurar o Service Worker para pré-carregar `summary.json` e armazenar os dados do estado ativo conforme a estratégia definida.
-- [ ] Verificar instalação e abertura da aplicação em modo standalone em dispositivo ou emulação compatível.
-- [ ] Verificar navegação offline para recursos armazenados e comunicar claramente quando dados não estiverem disponíveis offline.
-- [ ] Revisar acessibilidade de navegação por teclado, nomes acessíveis, contraste, foco e comportamento dos modais.
-- [ ] Avaliar tamanho dos JSONs e dos recursos do frontend; manter a partição por UF para evitar downloads desnecessários em redes móveis.
-- [ ] Verificar carregamento inicial e troca de estado em condições de rede móvel simuladas.
+- [x] Configurar o Web App Manifest com nome, ícones PNG de 192px e 512px, cores do design system e `display: standalone`.
+- [x] Configurar o Service Worker para pré-cachear `summary.json` com revisão pelo conteúdo e armazenar sob demanda os estados acessados usando Network First, limite de 27 arquivos e retenção de 30 dias.
+- [x] Validar o manifesto, os ícones, o registro do Service Worker e a configuração de modo standalone em navegador compatível.
+- [x] Verificar navegação offline para recursos armazenados e comunicar claramente quando um estado não estiver disponível no cache.
+- [x] Revisar acessibilidade de navegação por teclado, nomes acessíveis, contraste, foco e comportamento dos modais; botões navegáveis mantêm alvos mínimos de 48px.
+- [x] Avaliar tamanho dos artefatos publicados e manter a partição por UF; os JSONs demo atuais totalizam 3.658 bytes. O chunk de gráficos Recharts fica em 519,44 kB (149,67 kB gzip) e mantém o aviso de limite do Vite para eventual otimização futura.
+- [x] Verificar carregamento inicial e troca de estado em condição offline/emulação de rede.
 
 **Critérios de aceite da Fase 8**
 
-- [ ] O manifesto é válido, a aplicação pode ser instalada e o modo standalone funciona.
-- [ ] O Service Worker aplica a estratégia de cache documentada para o resumo e o estado ativo sem servir dados incorretos como atuais.
-- [ ] Os fluxos principais permanecem utilizáveis offline dentro dos limites do cache e informam quando uma informação não está disponível.
-- [ ] A interface mantém acessibilidade básica e desempenho compatível com o uso mobile-first.
+- [x] O manifesto é válido, contém ícones instaláveis e declara `display: standalone`.
+- [x] O Service Worker aplica a estratégia documentada: resumo pré-cacheado com revisão do conteúdo e estados acessados em Network First, limitando a retenção offline a 30 dias.
+- [x] Os fluxos principais permanecem utilizáveis offline dentro dos limites do cache e informam quando uma informação não está disponível.
+- [x] A interface mantém acessibilidade básica e desempenho compatível com o uso mobile-first.
 
 ## Fase 9 — Verificação integrada e preparação para publicação
 
